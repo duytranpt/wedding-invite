@@ -1,33 +1,4 @@
 /* ============================================================
-   TÙY CHỈNH NỘI DUNG — chỉ cần sửa các giá trị trong khối này
-   ============================================================ */
-
-// Ngày giờ cưới (dùng cho đếm ngược). Định dạng: 'YYYY-MM-DDTHH:mm:ss'
-const WEDDING_DATE = '2026-09-20T10:00:00';
-
-// Album ảnh tự động lấy TOÀN BỘ ảnh từ 1 folder Google Drive (không cần dán từng link).
-// Cách thiết lập — xem hướng dẫn chi tiết trong README mục "3. Ảnh từ Google Drive":
-//   1. Folder Drive -> chuột phải -> "Chia sẻ" -> đổi thành "Bất kỳ ai có đường liên kết"
-//   2. Copy ID trong link folder: https://drive.google.com/drive/folders/FOLDER_ID
-//   3. Tạo API key ở Google Cloud Console (bật "Google Drive API", giới hạn key theo domain
-//      GitHub Pages của bạn để tránh bị người khác lạm dụng key)
-//   4. Dán FOLDER_ID và API_KEY vào 2 biến bên dưới
-const DRIVE_FOLDER_ID = '1CphJRX9hxMk4tJomzIr5HXPoNlYIzb4D';
-const DRIVE_API_KEY = 'AIzaSyAeEgMTPJJhbUsgxsAry2kml1b4XVv4Kug'; // dán API key vào đây
-
-// Danh sách ảnh dự phòng, dùng khi chưa cấu hình DRIVE_API_KEY hoặc khi gọi Drive API lỗi.
-// Có thể để trống — trang sẽ hiện khung placeholder đẹp thay thế.
-const PHOTOS = [
-  // { url: 'https://drive.google.com/thumbnail?id=XXXXXXXX&sz=w1000', alt: 'Ảnh cưới 1' },
-];
-
-// Link webhook Google Apps Script để ghi RSVP vào Google Sheet (tuỳ chọn).
-// Nếu bạn đã có sẵn Apps Script từ dự án đặt sân bóng, có thể tái dùng
-// pattern doPost(e) tương tự. Để trống '' nếu chưa muốn nối RSVP tự động —
-// khi đó form sẽ chỉ hiện lời cảm ơn mà không gửi đi đâu.
-const RSVP_ENDPOINT = '';
-
-/* ============================================================
    PHẦN LOGIC — không cần sửa bên dưới trừ khi muốn thay đổi hành vi
    ============================================================ */
 
@@ -52,15 +23,20 @@ function updateCountdown(){
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-// ---- Ngày hiển thị ở hero, lấy tự động từ WEDDING_DATE ----
+// ---- Ngày hiển thị ở hero, lấy tự động từ WEDDING_DATE / WEDDING_END_DATE ----
 (function renderHeroDate(){
   const el = document.getElementById('hero-date');
   if(!el) return;
-  const date = new Date(WEDDING_DATE);
-  const weekday = date.toLocaleDateString('vi-VN', { weekday: 'long' });
-  const formatted = date.toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' });
-  const cap = weekday.charAt(0).toUpperCase() + weekday.slice(1);
-  el.textContent = `${cap}, ${formatted}`;
+  const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+  const start = new Date(WEDDING_DATE);
+  const end = WEDDING_END_DATE ? new Date(WEDDING_END_DATE) : null;
+  const wd = d => cap(d.toLocaleDateString('vi-VN', { weekday: 'long' }));
+
+  if(end && end.toDateString() !== start.toDateString()){
+    el.textContent = `${wd(start)} – ${wd(end)}, ${start.getDate()} – ${end.getDate()} Tháng ${end.getMonth() + 1}, ${end.getFullYear()}`;
+  } else {
+    el.textContent = `${wd(start)}, ${start.getDate()} Tháng ${start.getMonth() + 1}, ${start.getFullYear()}`;
+  }
 })();
 
 // ---- Hiệu ứng xuất hiện khi cuộn ----
@@ -81,54 +57,67 @@ setInterval(updateCountdown, 1000);
   items.forEach(el => io.observe(el));
 })();
 
-// ---- Lấy toàn bộ ảnh từ 1 folder Google Drive qua Drive API v3 ----
-async function fetchDriveFolderPhotos(){
-  if(!DRIVE_FOLDER_ID || !DRIVE_API_KEY) return null;
-
-  const q = `'${DRIVE_FOLDER_ID}' in parents and mimeType contains 'image/' and trashed = false`;
-  const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&key=${DRIVE_API_KEY}&fields=files(id,name)&orderBy=name&pageSize=1000`;
-
-  try{
-    const res = await fetch(url);
-    if(!res.ok) throw new Error(`Drive API trả về lỗi ${res.status}`);
-    const data = await res.json();
-    const files = data.files || [];
-    return files.map(f => ({
-      url: `https://drive.google.com/thumbnail?id=${f.id}&sz=w1000`,
-      alt: f.name
-    }));
-  } catch(err){
-    console.error('Không lấy được ảnh từ Drive folder, dùng danh sách dự phòng PHOTOS:', err);
-    return null;
-  }
-}
-
-// ---- Dựng album ảnh ----
-(async function renderGallery(){
-  const grid = document.getElementById('gallery-grid');
+// ---- Thẻ 4 concept: ảnh bìa = ảnh đầu tiên trong folder, bấm để mở trang album ----
+(async function renderAlbumCards(){
+  const grid = document.getElementById('album-cards');
   if(!grid) return;
 
-  const drivePhotos = await fetchDriveFolderPhotos();
-  const photos = (drivePhotos && drivePhotos.length) ? drivePhotos : PHOTOS;
+  ALBUMS.forEach(async (album) => {
+    const a = document.createElement('a');
+    a.className = 'album-card';
+    a.href = `album.html?c=${encodeURIComponent(album.slug)}`;
+    a.innerHTML = `
+      <div class="cover"></div>
+      <div class="meta">
+        <div class="ttl"></div>
+        <div class="sub"></div>
+        <span class="more">Xem thêm →</span>
+      </div>`;
+    a.querySelector('.ttl').textContent = album.title;
+    a.querySelector('.sub').textContent = album.subtitle || '';
+    grid.appendChild(a);
 
-  const slots = Math.max(photos.length, 6);
-  for(let i = 0; i < slots; i++){
-    const fig = document.createElement('figure');
-    const photo = photos[i];
-    if(photo){
+    const [cover] = await fetchDriveImages(album.folderId, { pageSize: 1 });
+    const box = a.querySelector('.cover');
+    if(cover){
       const img = document.createElement('img');
-      img.src = photo.url;
-      img.alt = photo.alt || `Ảnh cưới ${i + 1}`;
+      img.src = cover.url;
+      img.alt = album.title;
       img.loading = 'lazy';
-      fig.appendChild(img);
+      box.appendChild(img);
     } else {
-      const note = document.createElement('div');
-      note.className = 'ph-note';
-      note.textContent = `Ảnh ${i + 1}\n(thêm link Drive trong script.js)`;
-      fig.appendChild(note);
+      box.textContent = 'Sắp cập nhật';
+      box.classList.add('empty');
     }
-    grid.appendChild(fig);
-  }
+  });
+})();
+
+// ---- Mã QR nhận mừng cưới: lấy toàn bộ ảnh trong QR_FOLDER_ID ----
+(async function renderQr(){
+  const box = document.getElementById('qr-list');
+  if(!box) return;
+
+  const items = await fetchDriveImages(QR_FOLDER_ID, { thumb: 800 });
+  if(!items.length) return; // giữ nguyên khung placeholder trong HTML
+
+  box.innerHTML = '';
+  items.forEach(item => {
+    const fig = document.createElement('figure');
+    fig.className = 'qr-item';
+    const link = document.createElement('a');
+    link.href = item.full;
+    link.target = '_blank';
+    link.rel = 'noopener';
+    const img = document.createElement('img');
+    img.src = item.url;
+    img.alt = `Mã QR ${item.name}`;
+    img.loading = 'lazy';
+    link.appendChild(img);
+    const cap = document.createElement('figcaption');
+    cap.textContent = item.name;
+    fig.append(link, cap);
+    box.appendChild(fig);
+  });
 })();
 
 // ---- Xử lý RSVP ----

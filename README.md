@@ -6,18 +6,23 @@ Trang thiệp cưới tĩnh (HTML/CSS/JS thuần), phong cách **cổ điển sa
 
 ```
 wedding-invite/
-├── index.html   → nội dung & bố cục trang
-├── script.js    → nơi bạn sửa thông tin (ngày cưới, ảnh, endpoint RSVP)
+├── index.html   → trang chủ (bìa, lời mời, đếm ngược, 4 concept, chi tiết lễ, RSVP, QR mừng cưới)
+├── album.html   → trang xem ảnh của 1 concept (album.html?c=concept-1)
+├── config.js    → NƠI SỬA THÔNG TIN: ngày cưới, folder Drive các concept, folder QR, endpoint RSVP
+├── script.js    → logic trang chủ
+├── album.js     → logic trang album
+├── style.css    → giao diện dùng chung
 └── README.md    → file này
 ```
 
 ## 1. Sửa thông tin cưới
 
-Mở `script.js`, sửa 3 biến đầu file:
+Mở `config.js`:
 
-- `WEDDING_DATE` — ngày giờ cưới thật, dùng cho đồng hồ đếm ngược và ngày hiển thị ở trang bìa (tự động format tiếng Việt).
-- `PHOTOS` — mảng ảnh cho phần Album. Xem hướng dẫn lấy link Google Drive ngay trong comment của file.
-- `RSVP_ENDPOINT` — (tuỳ chọn) link webhook Google Apps Script nếu muốn RSVP tự ghi vào Google Sheet, tương tự cách bạn từng làm với hệ thống đặt sân bóng (`handleSet()` trong `Code.gs`). Có thể viết một `doPost(e)` đơn giản nhận JSON và append vào Sheet.
+- `WEDDING_DATE` / `WEDDING_END_DATE` — ngày giờ cưới (đếm ngược lấy theo `WEDDING_DATE`; ngày hiển thị ở bìa tự format tiếng Việt, ví dụ "24 – 25 Tháng 10, 2026").
+- `ALBUMS` — 4 concept, mỗi concept gồm `slug`, `title`, `subtitle`, `folderId` (ID folder Drive chứa ảnh concept đó).
+- `QR_FOLDER_ID` — folder Drive chứa ảnh mã QR nhận mừng cưới (để nhiều QR cũng được; tên file hiện làm chú thích).
+- `RSVP_ENDPOINT` — (tuỳ chọn) link webhook Google Apps Script để RSVP ghi vào Google Sheet.
 
 ## 2. Sửa nội dung/địa điểm
 
@@ -39,15 +44,15 @@ Trang đã được cấu hình để **tự động lấy toàn bộ ảnh tron
    ```
    https://drive.google.com/drive/folders/FOLDER_ID
    ```
-3. Dán `FOLDER_ID` vào biến `DRIVE_FOLDER_ID` trong `script.js` (đã điền sẵn theo link bạn gửi, kiểm tra lại cho chắc).
+3. Dán `FOLDER_ID` vào `folderId` của concept tương ứng trong `ALBUMS` (hoặc vào `QR_FOLDER_ID`) trong `config.js`. Mỗi concept và QR là một folder riêng, đều phải chia sẻ "Bất kỳ ai có đường liên kết".
 
 ### 3.2 Tạo API key (bắt buộc để gọi được Drive API)
 
 1. Vào [Google Cloud Console](https://console.cloud.google.com/) → tạo project mới (hoặc dùng project có sẵn)
 2. Vào **APIs & Services → Library**, tìm **Google Drive API** → bấm **Enable**
 3. Vào **APIs & Services → Credentials** → **Create Credentials → API key**
-4. Copy API key vừa tạo, dán vào biến `DRIVE_API_KEY` trong `script.js`
-5. **Quan trọng** — giới hạn key để tránh bị lộ/lạm dụng (vì key này sẽ nằm public trong `script.js` trên GitHub Pages):
+4. Copy API key vừa tạo, dán vào biến `DRIVE_API_KEY` trong `config.js`
+5. **Quan trọng** — giới hạn key để tránh bị lộ/lạm dụng (vì key này sẽ nằm public trong `config.js` trên GitHub Pages):
    - Bấm vào key vừa tạo → **Application restrictions** → chọn **Websites** → thêm domain GitHub Pages của bạn, ví dụ `https://<username>.github.io/*`
    - **API restrictions** → chọn **Restrict key** → chỉ tick **Google Drive API**
 
@@ -55,16 +60,13 @@ Với giới hạn này, key chỉ gọi được Drive API và chỉ hoạt đ�
 
 ### 3.3 Cách hoạt động
 
-`script.js` gọi Drive API v3 (`files.list`) để lấy toàn bộ file ảnh (`mimeType contains 'image/'`) trong `DRIVE_FOLDER_ID`, rồi tự dựng ảnh vào Album bằng link dạng:
+`config.js` gọi Drive API v3 (`files.list`) lấy các file ảnh trong từng folder rồi dựng link dạng:
 ```
 https://drive.google.com/thumbnail?id=FILE_ID&sz=w1000
 ```
-Thêm/xoá ảnh trong folder Drive → trang tự cập nhật ở lần tải sau, không cần sửa code.
-
-Nếu chưa điền `DRIVE_API_KEY` (hoặc Drive API gọi lỗi), trang tự fallback về mảng `PHOTOS` khai báo thủ công trong `script.js` — dùng theo định dạng link ảnh đơn lẻ:
-```
-https://drive.google.com/thumbnail?id=FILE_ID&sz=w1000
-```
+- Trang chủ: mỗi concept hiện ảnh đầu tiên (theo thứ tự tên file) làm ảnh bìa, bấm "Xem thêm" mở `album.html?c=<slug>`.
+- Trang album: hiện toàn bộ ảnh của concept, bấm ảnh để mở bản lớn.
+- Thêm/xoá ảnh trong folder Drive → trang tự cập nhật, không cần sửa code. Đặt tên file `01.jpg`, `02.jpg`… để kiểm soát thứ tự.
 
 ## 4. Deploy lên GitHub Pages (free)
 
@@ -88,6 +90,6 @@ Nếu muốn danh sách khách xác nhận tự đổ vào Google Sheet:
 
 1. Tạo Google Sheet mới, mở **Extensions → Apps Script**
 2. Viết hàm `doPost(e)` nhận JSON từ form, append vào sheet (tương tự cấu trúc bạn đã dùng cho `Code.gs` ở dự án đặt sân)
-3. Deploy dưới dạng **Web app**, copy URL, dán vào `RSVP_ENDPOINT` trong `script.js`
+3. Deploy dưới dạng **Web app**, copy URL, dán vào `RSVP_ENDPOINT` trong `config.js`
 
 Nếu bạn muốn, mình có thể viết sẵn đoạn `Code.gs` cho phần này ở lượt sau — chỉ cần nói.

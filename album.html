@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Album ảnh cưới — Duy Trần &amp; Thanh Huệ</title>
+<meta name="description" content="Album ảnh cưới Duy Trần & Thanh Huệ">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cormorant+SC:wght@500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="album-head">
+  <a class="back" href="index.html#album">← Về thiệp cưới</a>
+  <div class="eyebrow">Album ảnh cưới</div>
+  <h1 id="album-title">Album</h1>
+  <svg class="flourish" viewBox="0 0 180 34"><path d="M0 17 C 30 2, 60 32, 90 17 S 150 2, 180 17"/></svg>
+  <p class="lead" id="album-sub" style="color:var(--ink-soft);margin:0"></p>
+</header>
+
+<main class="album-body">
+  <div class="album-status" id="album-status">Đang tải ảnh…</div>
+  <div class="gallery-grid" id="gallery-grid"></div>
+  <nav class="album-switch" id="album-switch" aria-label="Chọn concept"></nav>
+</main>
+
+<footer>
+  <div class="monogram-sm">D &amp; H</div>
+  <div class="credit">Duy Trần &amp; Thanh Huệ</div>
+</footer>
+
+<script src="config.js"></script>
+<script src="album.js"></script>
+</body>
+</html>

@@ -10,278 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cormorant+SC:wght@500&display=swap" rel="stylesheet">
 
-<style>
-  /* ============================================================
-     THIẾT LẬP CHUNG — sửa các giá trị trong :root để đổi màu/font
-     ============================================================ */
-  :root{
-    --ivory: #FBF6EC;
-    --ivory-deep: #F4EBD9;
-    --paper: #FFFDF8;
-    --burgundy: #6E1F2B;
-    --burgundy-dark: #45141C;
-    --gold: #B4893E;
-    --gold-light: #E4CA98;
-    --ink: #2B2420;
-    --ink-soft: #6B5F52;
-    --line: rgba(110,31,43,0.18);
-
-    --font-display: 'Cormorant Garamond', serif;
-    --font-sc: 'Cormorant SC', serif;
-    --font-body: 'EB Garamond', serif;
-  }
-
-  *{ box-sizing: border-box; }
-  html{ scroll-behavior: smooth; }
-  body{
-    margin:0;
-    background: var(--ivory);
-    color: var(--ink);
-    font-family: var(--font-body);
-    font-size: 18px;
-    line-height: 1.7;
-    -webkit-font-smoothing: antialiased;
-  }
-  img{ max-width:100%; display:block; }
-
-  @media (prefers-reduced-motion: reduce){
-    *{ animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
-  }
-
-  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{
-    outline: 2px solid var(--burgundy);
-    outline-offset: 3px;
-  }
-
-  .eyebrow{
-    font-family: var(--font-sc);
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    font-size: 13px;
-    color: var(--gold);
-  }
-
-  .section{
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 96px 28px;
-    text-align: center;
-  }
-  .section h2{
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: clamp(30px, 5vw, 44px);
-    color: var(--burgundy);
-    margin: 10px 0 6px;
-  }
-  .section p.lead{
-    color: var(--ink-soft);
-    max-width: 480px;
-    margin: 0 auto;
-  }
-
-  .reveal{ opacity: 0; transform: translateY(24px); transition: opacity 0.9s ease, transform 0.9s ease; }
-  .reveal.is-visible{ opacity: 1; transform: translateY(0); }
-
-  /* ---------- Vạch trang trí chữ ký (signature ornament) ---------- */
-  .flourish{
-    width: 180px;
-    height: 34px;
-    margin: 18px auto 28px;
-    display: block;
-    overflow: visible;
-  }
-  .flourish path{
-    fill:none;
-    stroke: var(--gold);
-    stroke-width: 1.4;
-    stroke-linecap: round;
-    stroke-dasharray: 420;
-    stroke-dashoffset: 420;
-    animation: draw 1.8s ease forwards;
-    animation-delay: .3s;
-  }
-  @keyframes draw{ to{ stroke-dashoffset: 0; } }
-
-  /* ============================== HERO ============================== */
-  .hero{
-    position: relative;
-    min-height: 100svh;
-    display:flex;
-    flex-direction: column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding: 40px 24px;
-    color: var(--ivory);
-    background:
-      linear-gradient(180deg, rgba(69,20,28,.55), rgba(69,20,28,.72) 55%, rgba(69,20,28,.88)),
-      url('REPLACE_WITH_GDRIVE_LINK_COVER.jpg') center/cover no-repeat;
-    background-color: var(--burgundy-dark);
-  }
-  .hero::before{
-    /* khung viền mảnh cổ điển */
-    content:"";
-    position:absolute; inset: 22px;
-    border: 1px solid rgba(228,202,152,0.55);
-    pointer-events:none;
-  }
-  .hero .eyebrow{ color: var(--gold-light); opacity:0; animation: fadeUp .9s ease forwards; animation-delay: .1s; }
-  .hero .monogram{
-    font-family: var(--font-sc);
-    font-size: clamp(56px, 14vw, 96px);
-    line-height: 1;
-    margin: 18px 0 6px;
-    letter-spacing: 0.05em;
-    opacity:0; animation: fadeUp .9s ease forwards; animation-delay: .4s;
-  }
-  .hero .monogram .amp{ color: var(--gold); font-style: italic; font-family: var(--font-display); font-size: 0.6em; padding: 0 6px; }
-  .hero .names{
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: clamp(15px, 2.6vw, 19px);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ivory);
-    opacity:0; animation: fadeUp .9s ease forwards; animation-delay: .7s;
-  }
-  .hero .flourish path{ stroke: var(--gold-light); }
-  .hero .date{
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: clamp(18px, 3vw, 22px);
-    color: var(--gold-light);
-    opacity:0; animation: fadeUp .9s ease forwards; animation-delay: 1s;
-  }
-  .hero .scrollcue{
-    position:absolute; bottom: 34px; left:50%; transform: translateX(-50%);
-    font-family: var(--font-sc); letter-spacing: 0.3em; font-size: 11px; color: rgba(255,255,255,0.75);
-    opacity:0; animation: fadeUp .9s ease forwards; animation-delay: 1.3s;
-    display:flex; flex-direction:column; align-items:center; gap:8px;
-  }
-  .hero .scrollcue .stem{ width:1px; height:28px; background: rgba(255,255,255,0.6); animation: stem 1.8s ease-in-out infinite; }
-  @keyframes stem{ 0%,100%{ transform: scaleY(0.4); opacity:.4;} 50%{ transform: scaleY(1); opacity:1; } }
-  @keyframes fadeUp{ from{ opacity:0; transform: translateY(14px);} to{ opacity:1; transform:none; } }
-
-  /* ============================== INTRO / LỜI MỜI ============================== */
-  .intro blockquote{
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: clamp(20px, 3vw, 26px);
-    color: var(--ink);
-    margin: 0;
-    line-height: 1.6;
-  }
-  .intro .signee{ margin-top: 22px; font-family: var(--font-sc); letter-spacing:.18em; font-size: 14px; color: var(--gold); }
-
-  /* ============================== COUNTDOWN ============================== */
-  .countdown-wrap{ background: var(--ivory-deep); }
-  .countdown{
-    display:flex; gap: clamp(14px, 4vw, 36px); justify-content:center; margin-top: 20px; flex-wrap: wrap;
-  }
-  .countdown .cell{ min-width: 76px; }
-  .countdown .num{
-    font-family: var(--font-display);
-    font-size: clamp(34px, 6vw, 52px);
-    color: var(--burgundy);
-    font-variant-numeric: tabular-nums;
-  }
-  .countdown .lbl{
-    font-family: var(--font-sc);
-    font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-soft);
-  }
-
-  /* ============================== GALLERY ============================== */
-  .gallery-grid{
-    display:grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 28px;
-    max-width: 900px;
-    margin-inline: auto;
-  }
-  .gallery-grid figure{
-    margin:0; overflow:hidden; position:relative;
-    aspect-ratio: 3/4;
-    background: linear-gradient(135deg, var(--ivory-deep), #E9DCC0);
-    border: 1px solid var(--line);
-  }
-  .gallery-grid figure:nth-child(3n+2){ aspect-ratio: 4/5; }
-  .gallery-grid img{ width:100%; height:100%; object-fit:cover; transition: transform .6s ease; }
-  .gallery-grid figure:hover img{ transform: scale(1.06); }
-  .gallery-grid .ph-note{
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font-family: var(--font-sc); font-size: 11px; letter-spacing:.1em; color: var(--ink-soft); text-align:center; padding: 10px;
-  }
-  @media (max-width: 560px){ .gallery-grid{ grid-template-columns: repeat(2, 1fr); } }
-
-  /* ============================== CHI TIẾT LỄ CƯỚI ============================== */
-  .details-wrap{ background: var(--burgundy); color: var(--ivory); }
-  .details-wrap .eyebrow{ color: var(--gold-light); }
-  .details-wrap h2{ color: var(--ivory); }
-  .details-wrap .flourish path{ stroke: var(--gold-light); }
-  .events{
-    display:grid; gap: 28px; margin-top: 34px;
-    grid-template-columns: 1fr 1fr;
-  }
-  @media (max-width: 620px){ .events{ grid-template-columns: 1fr; } }
-  .event-card{
-    border: 1px solid rgba(228,202,152,0.35);
-    padding: 30px 22px;
-    background: rgba(255,255,255,0.03);
-  }
-  .event-card .kind{ font-family: var(--font-sc); letter-spacing:.2em; font-size:12px; color: var(--gold-light); text-transform:uppercase; }
-  .event-card .time{ font-family: var(--font-display); font-size: 30px; margin: 10px 0 4px; }
-  .event-card .place{ font-family: var(--font-body); font-style: italic; color: rgba(251,246,236,0.85); }
-  .map-frame{ margin-top: 34px; border: 1px solid rgba(228,202,152,0.35); }
-  .map-frame iframe{ width:100%; height: 300px; border:0; filter: sepia(8%); }
-  .addr-note{ margin-top:14px; font-size: 15px; color: rgba(251,246,236,0.8); }
-
-  /* ============================== RSVP ============================== */
-  .rsvp-form{
-    margin-top: 30px; text-align:left; display:grid; gap: 18px; max-width: 460px; margin-inline:auto;
-  }
-  .field{ display:flex; flex-direction:column; gap:6px; }
-  .field label{ font-family: var(--font-sc); letter-spacing:.14em; font-size: 12px; text-transform:uppercase; color: var(--ink-soft); }
-  .field input, .field select, .field textarea{
-    font-family: var(--font-body); font-size: 17px; color: var(--ink);
-    border: none; border-bottom: 1px solid var(--line);
-    background: transparent; padding: 8px 2px;
-  }
-  .field textarea{ resize: vertical; min-height: 70px; }
-  .field input:focus, .field select:focus, .field textarea:focus{ border-bottom-color: var(--burgundy); }
-  .rsvp-submit{
-    justify-self:center; margin-top: 6px;
-    font-family: var(--font-sc); letter-spacing:.22em; text-transform:uppercase; font-size: 13px;
-    background: var(--burgundy); color: var(--ivory);
-    border: 1px solid var(--burgundy); padding: 14px 38px; cursor:pointer;
-    transition: background .3s ease, color .3s ease;
-  }
-  .rsvp-submit:hover{ background: transparent; color: var(--burgundy); }
-  .rsvp-note{ font-size: 14px; color: var(--ink-soft); margin-top: 16px; text-align:center; }
-  .rsvp-status{ text-align:center; font-family: var(--font-display); font-style:italic; color: var(--burgundy); min-height: 24px; margin-top: 10px; }
-
-  /* ============================== HỘP MỪNG CƯỚI ============================== */
-  .gift-wrap{ background: var(--ivory-deep); }
-  .gift-box{
-    margin-top: 30px; display:inline-flex; flex-direction:column; align-items:center; gap: 14px;
-    border: 1px solid var(--line); padding: 34px 40px; background: var(--paper);
-  }
-  .gift-box .qr{
-    width: 160px; height:160px; border: 1px dashed var(--line);
-    display:flex; align-items:center; justify-content:center;
-    font-family: var(--font-sc); font-size: 11px; color: var(--ink-soft); text-align:center; padding: 10px;
-  }
-  .gift-box .bank{ font-family: var(--font-body); font-size: 15px; color: var(--ink-soft); text-align:center; }
-  .gift-box .bank strong{ color: var(--ink); }
-
-  /* ============================== FOOTER ============================== */
-  footer{
-    text-align:center; padding: 60px 24px 50px; background: var(--burgundy-dark); color: var(--gold-light);
-  }
-  footer .monogram-sm{ font-family: var(--font-sc); font-size: 22px; letter-spacing:.1em; margin-bottom: 8px; }
-  footer .credit{ font-size: 13px; opacity: .7; margin-top: 18px; color: var(--ivory); }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -291,7 +20,7 @@
   <div class="monogram">D<span class="amp">&amp;</span>H</div>
   <div class="names">Duy Trần &nbsp;·&nbsp; Thanh Huệ</div>
   <svg class="flourish" viewBox="0 0 180 34"><path d="M0 17 C 30 2, 60 32, 90 17 S 150 2, 180 17"/></svg>
-  <div class="date" id="hero-date">Chủ Nhật, 20 Tháng 9, 2026</div>
+  <div class="date" id="hero-date">Thứ Bảy – Chủ Nhật, 24 – 25 Tháng 10, 2026</div>
   <div class="scrollcue"><span>Cuộn xuống</span><span class="stem"></span></div>
 </header>
 
@@ -319,11 +48,11 @@
 </section>
 
 <!-- ============================== GALLERY ============================== -->
-<section class="section gallery reveal">
+<section class="section gallery reveal" id="album">
   <div class="eyebrow">Khoảnh khắc</div>
   <h2>Album ảnh</h2>
-  <p class="lead">Thay các ảnh bên dưới bằng link ảnh từ Google Drive của bạn — xem hướng dẫn trong README.</p>
-  <div class="gallery-grid" id="gallery-grid"></div>
+  <p class="lead">Bốn câu chuyện, bốn sắc thái — chọn một concept để xem trọn bộ ảnh.</p>
+  <div class="album-cards" id="album-cards"></div>
 </section>
 
 <!-- ============================== CHI TIẾT LỄ CƯỚI ============================== -->
@@ -335,12 +64,12 @@
     <div class="event-card">
       <div class="kind">Lễ Vu Quy</div>
       <div class="time">10:00</div>
-      <div class="place">Chủ Nhật, 20/09/2026<br>Tư gia — 22 Láng Hạ, Đống Đa, Hà Nội</div>
+      <div class="place">Thứ Bảy, 24/10/2026<br>Tư gia — 22 Láng Hạ, Đống Đa, Hà Nội</div>
     </div>
     <div class="event-card">
       <div class="kind">Tiệc Cưới</div>
       <div class="time">18:00</div>
-      <div class="place">Chủ Nhật, 20/09/2026<br>22 Láng Hạ, Đống Đa, Hà Nội</div>
+      <div class="place">Chủ Nhật, 25/10/2026<br>22 Láng Hạ, Đống Đa, Hà Nội</div>
     </div>
   </div>
   <div class="map-frame">
@@ -388,11 +117,8 @@
   <h2>Gửi lời chúc phúc</h2>
   <p class="lead">Sự hiện diện của bạn là món quà quý giá nhất. Nếu bạn muốn gửi mừng cưới từ xa, chúng mình xin trân trọng đón nhận qua:</p>
   <div class="gift-box">
-    <div class="qr">Dán ảnh mã QR<br>chuyển khoản tại đây</div>
-    <div class="bank">
-      <strong>Duy Trần</strong><br>
-      Ngân hàng: [Tên ngân hàng]<br>
-      STK: [Số tài khoản]
+    <div class="qr-list" id="qr-list">
+      <div class="qr">Mã QR<br>sẽ hiện tại đây</div>
     </div>
   </div>
 </section>
@@ -404,6 +130,7 @@
   <div class="credit">Duy Trần &amp; Thanh Huệ · Tháng 9, 2026</div>
 </footer>
 
+<script src="config.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
