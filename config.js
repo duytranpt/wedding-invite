@@ -26,7 +26,7 @@ const ALBUMS = [
 
 // Folder chứa ảnh mã QR nhận mừng cưới. Tên file ảnh sẽ hiện làm chú thích dưới mỗi QR
 // (ví dụ "Duy Trần - Vietcombank.png" -> "Duy Trần - Vietcombank"). Có thể để nhiều QR.
-const QR_FOLDER_ID = '';
+const QR_FOLDER_ID = '1HriU3eTAr46PeMcDFxpStqs6TNIGgLVO';
 
 // Link webhook Google Apps Script để ghi RSVP vào Google Sheet (tuỳ chọn).
 const RSVP_ENDPOINT = '';
