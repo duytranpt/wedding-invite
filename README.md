@@ -29,7 +29,7 @@ Mở `config.js`:
 Mở `index.html`, tìm các phần:
 
 - `.hero` — tên cô dâu chú rể, ảnh bìa (đổi `REPLACE_WITH_GDRIVE_LINK_COVER.jpg` trong CSS `.hero{ background: ... url(...) }`)
-- `.event-card` — giờ lễ Vu Quy / Tiệc Cưới, địa chỉ (hiện đang để `22 Láng Hạ, Đống Đa, Hà Nội` — sửa số nhà/quận cho đúng)
+- `.event-card` — giờ LỄ THÀNH HÔN / Tiệc Cưới, địa chỉ (hiện đang để `Thôn 7 Hiền Lương, Phú Thọ` — sửa số nhà/quận cho đúng)
 - `.map-frame iframe src` — bản đồ tự lấy theo địa chỉ trong query string, sửa theo địa chỉ thật nếu khác
 - `.gift-box` — tên ngân hàng, số tài khoản, và dán ảnh mã QR chuyển khoản (thay đoạn text placeholder bằng thẻ `<img>`)
 
