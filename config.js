@@ -15,13 +15,19 @@ const WEDDING_END_DATE = '2026-10-25T18:00:00';
 //   3. Dùng chung 1 API key (Google Cloud Console, bật "Google Drive API", giới hạn theo domain GitHub Pages)
 const DRIVE_API_KEY = 'AIzaSyAeEgMTPJJhbUsgxsAry2kml1b4XVv4Kug';
 
+// Mô tả từng concept — hiện dưới tiêu đề ở thẻ trang chủ và đầu trang album.
+const DESC_XUAN = 'Mùa của những khởi đầu — trong trẻo, ngọt ngào và tình yêu vừa nở rộ.';
+const DESC_HA = 'Rực rỡ nắng vàng — nồng nhiệt, tự do như tuổi thanh xuân bên nhau.';
+const DESC_THU = 'Dịu dàng và trầm lắng — tình yêu của thấu hiểu và lựa chọn đồng hành.';
+const DESC_DONG = 'Tĩnh lặng mà ấm áp — chỉ cần có nhau, mùa nào cũng là bình yên.';
+
 // 4 concept ảnh cưới. `slug` là phần định danh trên URL (album.html?c=slug), không dấu, không khoảng trắng.
 // Để folderId '' nếu chưa có ảnh — thẻ vẫn hiện nhưng chưa có ảnh bìa.
 const ALBUMS = [
-  { slug: 'concept-1', title: 'Concept 1', subtitle: 'Mô tả ngắn', folderId: '1htNJVBclu9UC5s1cvk22WJLVWvnRISPQ' },
-  { slug: 'concept-2', title: 'Concept 2', subtitle: 'Mô tả ngắn', folderId: '1qkodPd2b9xAbLaoLqcOVTasr4pOHgtf6' },
-  { slug: 'concept-3', title: 'Concept 3', subtitle: 'Mô tả ngắn', folderId: '13Nm-9LLx3lV-_SR0iprOzqESjp7dQo6n' },
-  { slug: 'concept-4', title: 'Concept 4', subtitle: 'Mô tả ngắn', folderId: '1llvwZ1AghGa3HAQIUd3HZjv26_yF_Qvo' },
+  { slug: 'concept-2', title: 'Xuân', subtitle: DESC_XUAN, folderId: '1qkodPd2b9xAbLaoLqcOVTasr4pOHgtf6' },
+  { slug: 'concept-3', title: 'Hạ', subtitle: DESC_HA, folderId: '13Nm-9LLx3lV-_SR0iprOzqESjp7dQo6n' },
+  { slug: 'concept-1', title: 'Thu', subtitle: DESC_THU , folderId: '1htNJVBclu9UC5s1cvk22WJLVWvnRISPQ' },
+  { slug: 'concept-4', title: 'Đông', subtitle: DESC_DONG, folderId: '1llvwZ1AghGa3HAQIUd3HZjv26_yF_Qvo' },
 ];
 
 // Folder chứa ảnh mã QR nhận mừng cưới. Tên file ảnh sẽ hiện làm chú thích dưới mỗi QR
