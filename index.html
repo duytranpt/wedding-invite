@@ -87,7 +87,7 @@
   <form class="rsvp-form" id="rsvp-form">
     <div class="field">
       <label for="rsvp-name">Họ và tên</label>
-      <input id="rsvp-name" name="name" type="text" required placeholder="Nguyễn Văn A">
+      <input id="rsvp-name" name="name" type="text" required maxlength="100" autocomplete="name" placeholder="duytc">
     </div>
     <div class="field">
       <label for="rsvp-attend">Bạn có thể tham dự?</label>
@@ -97,18 +97,21 @@
         <option value="no">Rất tiếc, mình không thể đến</option>
       </select>
     </div>
-    <div class="field">
+    <div class="field" id="rsvp-guests-field">
       <label for="rsvp-guests">Số người đi cùng</label>
-      <input id="rsvp-guests" name="guests" type="number" min="0" max="10" value="0">
+      <input id="rsvp-guests" name="guests" type="number" inputmode="numeric" min="1" max="5" value="1">
     </div>
     <div class="field">
       <label for="rsvp-msg">Lời chúc gửi cô dâu chú rể</label>
-      <textarea id="rsvp-msg" name="message" placeholder="Chúc hai bạn trăm năm hạnh phúc..."></textarea>
+      <textarea id="rsvp-msg" name="message" maxlength="1000" placeholder="Chúc hai bạn trăm năm hạnh phúc..."></textarea>
+    </div>
+    <div class="rsvp-hp" aria-hidden="true">
+      <label for="rsvp-website">Website</label>
+      <input id="rsvp-website" name="website" type="text" tabindex="-1" autocomplete="off">
     </div>
     <button class="rsvp-submit" type="submit">Gửi xác nhận</button>
   </form>
-  <div class="rsvp-status" id="rsvp-status"></div>
-  <p class="rsvp-note">* Form này sẵn sàng để nối với Google Sheet qua Google Apps Script — xem README để lấy link webhook và dán vào biến <code>RSVP_ENDPOINT</code> trong file script.js.</p>
+  <div class="rsvp-status" id="rsvp-status" role="status" aria-live="polite"></div>
 </section>
 
 <!-- ============================== HỘP MỪNG CƯỚI ============================== -->

@@ -12,6 +12,7 @@ wedding-invite/
 ├── script.js    → logic trang chủ
 ├── album.js     → logic trang album
 ├── style.css    → giao diện dùng chung
+├── apps-script/Code.gs → backend RSVP (dán vào Apps Script của Google Sheet)
 └── README.md    → file này
 ```
 
@@ -22,7 +23,7 @@ Mở `config.js`:
 - `WEDDING_DATE` / `WEDDING_END_DATE` — ngày giờ cưới (đếm ngược lấy theo `WEDDING_DATE`; ngày hiển thị ở bìa tự format tiếng Việt, ví dụ "24 – 25 Tháng 10, 2026").
 - `ALBUMS` — 4 concept, mỗi concept gồm `slug`, `title`, `subtitle`, `folderId` (ID folder Drive chứa ảnh concept đó).
 - `QR_FOLDER_ID` — folder Drive chứa ảnh mã QR nhận mừng cưới (để nhiều QR cũng được; tên file hiện làm chú thích).
-- `RSVP_ENDPOINT` — (tuỳ chọn) link webhook Google Apps Script để RSVP ghi vào Google Sheet.
+- `RSVP_ENDPOINT` — Web app URL của Google Apps Script để RSVP ghi vào Google Sheet (xem mục 5).
 
 ## 2. Sửa nội dung/địa điểm
 
@@ -84,12 +85,19 @@ Link thiệp sẽ có dạng: `https://<username>.github.io/wedding-invite/`
 
 Muốn tên miền ngắn gọn hơn để gửi khách, có thể rút gọn bằng bit.ly hoặc mua domain riêng rồi trỏ CNAME vào GitHub Pages.
 
-## 5. Kết nối RSVP với Google Sheet (tuỳ chọn)
+## 5. Kết nối RSVP với Google Sheet
 
-Nếu muốn danh sách khách xác nhận tự đổ vào Google Sheet:
+Form "Xác nhận tham dự" ghi vào Google Sheet qua Apps Script trong [apps-script/Code.gs](apps-script/Code.gs). **Chưa cấu hình `RSVP_ENDPOINT` thì form không lưu được** — khách bấm gửi sẽ thấy lời nhắn liên hệ trực tiếp.
 
-1. Tạo Google Sheet mới, mở **Extensions → Apps Script**
-2. Viết hàm `doPost(e)` nhận JSON từ form, append vào sheet (tương tự cấu trúc bạn đã dùng cho `Code.gs` ở dự án đặt sân)
-3. Deploy dưới dạng **Web app**, copy URL, dán vào `RSVP_ENDPOINT` trong `config.js`
+1. Tạo Google Sheet mới (ví dụ "RSVP đám cưới"), mở **Extensions → Apps Script**
+2. Xoá code mặc định, dán toàn bộ nội dung `apps-script/Code.gs` vào, bấm **Save**
+3. **Deploy → New deployment** → bánh răng chọn **Web app**:
+   - *Execute as*: **Me**
+   - *Who has access*: **Anyone** (bắt buộc, để khách không cần đăng nhập Google)
+4. Bấm **Deploy**, cấp quyền cho script (Google sẽ cảnh báo "unverified app" → *Advanced → Go to ...*)
+5. Copy **Web app URL** (dạng `https://script.google.com/macros/s/.../exec`), dán vào `RSVP_ENDPOINT` trong `config.js`
+6. Kiểm tra: mở URL đó trên trình duyệt phải thấy `{"ok":true}`; gửi thử 1 RSVP trên trang → sheet `RSVP` tự tạo với dòng tiêu đề và dòng dữ liệu mới
 
-Nếu bạn muốn, mình có thể viết sẵn đoạn `Code.gs` cho phần này ở lượt sau — chỉ cần nói.
+Sheet có các cột: Thời gian, Họ và tên, Tham dự (Có / Có thể / Không), Số người đi cùng, Lời chúc, User agent.
+
+**Lưu ý khi sửa `Code.gs` sau này:** phải vào **Deploy → Manage deployments → ✏️ Edit → Version: New version → Deploy** thì thay đổi mới có hiệu lực. Làm cách này URL giữ nguyên; nếu tạo "New deployment" thì URL đổi và phải dán lại vào `config.js`.

@@ -126,30 +126,64 @@ setInterval(updateCountdown, 1000);
   const status = document.getElementById('rsvp-status');
   if(!form) return;
 
+  const attendSelect = form.elements.attend;
+  const guestsField = document.getElementById('rsvp-guests-field');
+  const submitBtn = form.querySelector('.rsvp-submit');
+  const submitLabel = submitBtn.textContent;
+
+  const setStatus = (text, isError = false) => {
+    status.textContent = text;
+    status.classList.toggle('is-error', isError);
+  };
+
+  // Không đi thì không cần hỏi số người đi cùng.
+  const syncGuestsField = () => {
+    const isAttending = attendSelect.value !== 'no';
+    guestsField.hidden = !isAttending;
+    if(!isAttending) form.elements.guests.value = 0;
+  };
+  attendSelect.addEventListener('change', syncGuestsField);
+  syncGuestsField();
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(form).entries());
-    data.timestamp = new Date().toISOString();
 
-    const submitBtn = form.querySelector('.rsvp-submit');
+    if(!RSVP_ENDPOINT){
+      console.warn('RSVP_ENDPOINT chưa được cấu hình trong config.js — xem README mục 5.');
+      setStatus('Form xác nhận đang được cập nhật, bạn nhắn trực tiếp cho cô dâu chú rể giúp mình nhé.', true);
+      return;
+    }
+
+    const data = Object.fromEntries(new FormData(form).entries());
+    data.name = data.name.trim();
+    data.userAgent = navigator.userAgent;
+    if(!data.name){
+      setStatus('Bạn điền họ tên giúp mình nhé.', true);
+      form.elements.name.focus();
+      return;
+    }
+
     submitBtn.disabled = true;
+    submitBtn.textContent = 'Đang gửi...';
+    setStatus('');
 
     try{
-      if(RSVP_ENDPOINT){
-        await fetch(RSVP_ENDPOINT, {
-          method: 'POST',
-          mode: 'no-cors', // Apps Script webhook thường cần no-cors từ trình duyệt
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-      }
-      status.textContent = 'Cảm ơn bạn! Lời xác nhận đã được gửi tới cô dâu chú rể 💌';
-      form.reset();
+      // Body là string -> Content-Type text/plain: "simple request", không bị CORS preflight
+      // (Apps Script không trả lời OPTIONS), nhưng vẫn đọc được response để biết đã ghi thật chưa.
+      const res = await fetch(RSVP_ENDPOINT, { method: 'POST', body: JSON.stringify(data) });
+      const result = await res.json();
+      if(!result.ok) throw new Error(result.error || 'unknown_error');
+
+      form.hidden = true;
+      setStatus(data.attend === 'no'
+        ? 'Cảm ơn bạn đã báo tin và gửi lời chúc. Chúng mình sẽ nhớ đến bạn trong ngày vui 💌'
+        : 'Cảm ơn bạn! Chúng mình rất mong được gặp bạn trong ngày vui 💌');
     } catch(err){
-      status.textContent = 'Có lỗi khi gửi, bạn thử lại giúp mình nhé.';
       console.error('RSVP submit error:', err);
+      setStatus('Có lỗi khi gửi, bạn thử lại giúp mình nhé.', true);
     } finally {
       submitBtn.disabled = false;
+      submitBtn.textContent = submitLabel;
     }
   });
 })();

@@ -28,8 +28,9 @@ const ALBUMS = [
 // (ví dụ "Duy Trần - Vietcombank.png" -> "Duy Trần - Vietcombank"). Có thể để nhiều QR.
 const QR_FOLDER_ID = '1HriU3eTAr46PeMcDFxpStqs6TNIGgLVO';
 
-// Link webhook Google Apps Script để ghi RSVP vào Google Sheet (tuỳ chọn).
-const RSVP_ENDPOINT = '';
+// Web app URL của Google Apps Script (apps-script/Code.gs) để ghi RSVP vào Google Sheet — xem README mục 5.
+// Dạng: 'https://script.google.com/macros/s/XXXX/exec'. Để trống thì form không lưu được.
+const RSVP_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxkt3E7mGSbJSOlB_JyE2UAMqygmeRpY3BZzHBeOrjW6d7m5QoXPYaskcf_9RSOHxmM/exec';
 
 /* ============================================================
    HÀM DÙNG CHUNG

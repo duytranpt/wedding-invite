@@ -291,8 +291,12 @@
     transition: background .3s ease, color .3s ease;
   }
   .rsvp-submit:hover{ background: transparent; color: var(--burgundy); }
-  .rsvp-note{ font-size: 14px; color: var(--ink-soft); margin-top: 16px; text-align:center; }
-  .rsvp-status{ text-align:center; font-family: var(--font-display); font-style:italic; color: var(--burgundy); min-height: 24px; margin-top: 10px; }
+  .rsvp-submit:disabled{ opacity: .6; cursor: wait; }
+  .field[hidden], .rsvp-form[hidden]{ display:none; }
+  /* Honeypot: hidden from humans, still filled in by naive bots. */
+  .rsvp-hp{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+  .rsvp-status{ text-align:center; font-family: var(--font-display); font-style:italic; font-size: 20px; color: var(--burgundy); min-height: 24px; margin-top: 10px; }
+  .rsvp-status.is-error{ font-size: 17px; color: var(--ink-soft); }
 
   /* ============================== HỘP MỪNG CƯỚI ============================== */
   .gift-wrap{ background: var(--ivory-deep); }
