@@ -5,7 +5,8 @@
  */
 
 const SHEET_NAME = 'RSVP';
-const HEADERS = ['Thời gian', 'Họ và tên', 'Tham dự', 'Số người đi cùng', 'Lời chúc', 'User agent'];
+// New columns go at the end so rows written by older versions stay aligned.
+const HEADERS = ['Thời gian', 'Họ và tên', 'Tham dự', 'Số người đi cùng', 'Lời chúc', 'User agent', 'Khách nhà'];
 const ATTEND_LABELS = { yes: 'Có', maybe: 'Có thể', no: 'Không' };
 const MAX_GUESTS = 10;
 
@@ -32,6 +33,7 @@ function doPost(e) {
         guests,
         clean(data.message, 1000),
         clean(data.userAgent, 300),
+        clean(data.side, 30),
       ]);
     } finally {
       lock.releaseLock();
@@ -53,10 +55,9 @@ function getSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(HEADERS);
+  if (sheet.getLastRow() === 0 || sheet.getLastColumn() < HEADERS.length) {
+    sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]).setFontWeight('bold');
     sheet.setFrozenRows(1);
-    sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold');
   }
   return sheet;
 }

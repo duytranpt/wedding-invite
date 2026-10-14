@@ -2,9 +2,13 @@
    PHẦN LOGIC — không cần sửa bên dưới trừ khi muốn thay đổi hành vi
    ============================================================ */
 
-// ---- Đếm ngược ----
+const eventDateTime = ev => new Date(`${ev.date}T${ev.time}:00`);
+
+// ---- Đếm ngược tới lễ sớm nhất của bên gửi thiệp ----
+const COUNTDOWN_TARGET = Math.min(...CURRENT_SIDE.events.map(ev => eventDateTime(ev).getTime()));
+
 function updateCountdown(){
-  const target = new Date(WEDDING_DATE).getTime();
+  const target = COUNTDOWN_TARGET;
   const now = Date.now();
   const diff = Math.max(0, target - now);
 
@@ -39,6 +43,38 @@ setInterval(updateCountdown, 1000);
   }
 })();
 
+// ---- Thông tin buổi lễ + bản đồ theo bên gửi thiệp (SIDES trong config.js) ----
+(function renderEvents(){
+  const list = document.getElementById('events');
+  if(!list) return;
+
+  const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+  const pad = n => String(n).padStart(2, '0');
+
+  CURRENT_SIDE.events.forEach(ev => {
+    const d = eventDateTime(ev);
+    const card = document.createElement('div');
+    card.className = 'event-card';
+    card.innerHTML = '<div class="kind"></div><div class="time"></div><div class="place"><span class="day"></span><br><span class="where"></span></div>';
+    card.querySelector('.kind').textContent = ev.kind;
+    card.querySelector('.time').textContent = ev.time;
+    card.querySelector('.day').textContent =
+      `${cap(d.toLocaleDateString('vi-VN', { weekday: 'long' }))}, ${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+    card.querySelector('.where').textContent = ev.place;
+    list.appendChild(card);
+  });
+
+  const { address, mapEmbed, showMap } = CURRENT_SIDE;
+  if(showMap === false){
+    document.getElementById('event-map-frame').remove();
+  } else {
+    const map = document.getElementById('event-map');
+    map.src = mapEmbed || `https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`;
+    map.title = address;
+  }
+  document.getElementById('event-address').textContent = address;
+})();
+
 // ---- Hiệu ứng xuất hiện khi cuộn ----
 (function scrollReveal(){
   const items = document.querySelectorAll('.reveal');
@@ -65,7 +101,7 @@ setInterval(updateCountdown, 1000);
   ALBUMS.forEach(async (album) => {
     const a = document.createElement('a');
     a.className = 'album-card';
-    a.href = `album.html?c=${encodeURIComponent(album.slug)}`;
+    a.href = withSide(`album.html?c=${encodeURIComponent(album.slug)}`);
     a.innerHTML = `
       <div class="cover"></div>
       <div class="meta">
@@ -156,6 +192,7 @@ setInterval(updateCountdown, 1000);
 
     const data = Object.fromEntries(new FormData(form).entries());
     data.name = data.name.trim();
+    data.side = CURRENT_SIDE.label;
     data.userAgent = navigator.userAgent;
     if(!data.name){
       setStatus('Bạn điền họ tên giúp mình nhé.', true);

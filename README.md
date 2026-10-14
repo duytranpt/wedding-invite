@@ -25,14 +25,30 @@ Mở `config.js`:
 - `QR_FOLDER_ID` — folder Drive chứa ảnh mã QR nhận mừng cưới (để nhiều QR cũng được; tên file hiện làm chú thích).
 - `RSVP_ENDPOINT` — Web app URL của Google Apps Script để RSVP ghi vào Google Sheet (xem mục 5).
 
-## 2. Sửa nội dung/địa điểm
+## 2. Phiên bản nhà trai / nhà gái
+
+Cùng 1 trang, giờ lễ, địa điểm, bản đồ và đếm ngược đổi theo bên gửi thiệp. Sửa trong `SIDES` ở `config.js`:
+
+- `events` — danh sách lễ (`kind`, `date` dạng `YYYY-MM-DD`, `time` dạng `HH:mm`, `place`). Thứ ngày tự format tiếng Việt; đếm ngược chạy tới lễ sớm nhất.
+- `address` — địa chỉ hiện dưới phần thông tin lễ.
+- `showMap` — `false` để ẩn bản đồ (hiện đang ẩn với nhà gái).
+- `mapEmbed` — link nhúng Google Maps (Maps → Chia sẻ → Nhúng bản đồ → copy phần `src`). Để `''` thì tự tạo bản đồ theo `address`.
+
+Link gửi khách:
+
+| Bên gửi | Link |
+|---|---|
+| Nhà trai (mặc định) | `https://<username>.github.io/wedding-invite/` |
+| Nhà gái | `https://<username>.github.io/wedding-invite/?side=nha-gai` |
+
+Tham số `side` được giữ khi khách bấm qua lại trang album, và được ghi vào cột "Khách nhà" trong Google Sheet RSVP.
+
+## 2.1 Sửa nội dung khác
 
 Mở `index.html`, tìm các phần:
 
 - `.hero` — tên cô dâu chú rể, ảnh bìa (đổi `REPLACE_WITH_GDRIVE_LINK_COVER.jpg` trong CSS `.hero{ background: ... url(...) }`)
-- `.event-card` — giờ LỄ THÀNH HÔN / Tiệc Cưới, địa chỉ (hiện đang để `Thôn 7 Hiền Lương, Phú Thọ` — sửa số nhà/quận cho đúng)
-- `.map-frame iframe src` — bản đồ tự lấy theo địa chỉ trong query string, sửa theo địa chỉ thật nếu khác
-- `.gift-box` — tên ngân hàng, số tài khoản, và dán ảnh mã QR chuyển khoản (thay đoạn text placeholder bằng thẻ `<img>`)
+- `.gift-box` — mã QR mừng cưới lấy tự động từ `QR_FOLDER_ID`
 
 ## 3. Ảnh từ Google Drive
 
@@ -98,6 +114,6 @@ Form "Xác nhận tham dự" ghi vào Google Sheet qua Apps Script trong [apps-s
 5. Copy **Web app URL** (dạng `https://script.google.com/macros/s/.../exec`), dán vào `RSVP_ENDPOINT` trong `config.js`
 6. Kiểm tra: mở URL đó trên trình duyệt phải thấy `{"ok":true}`; gửi thử 1 RSVP trên trang → sheet `RSVP` tự tạo với dòng tiêu đề và dòng dữ liệu mới
 
-Sheet có các cột: Thời gian, Họ và tên, Tham dự (Có / Có thể / Không), Số người đi cùng, Lời chúc, User agent.
+Sheet có các cột: Thời gian, Họ và tên, Tham dự (Có / Có thể / Không), Số người đi cùng, Lời chúc, User agent, Khách nhà (Nhà trai / Nhà gái).
 
 **Lưu ý khi sửa `Code.gs` sau này:** phải vào **Deploy → Manage deployments → ✏️ Edit → Version: New version → Deploy** thì thay đổi mới có hiệu lực. Làm cách này URL giữ nguyên; nếu tạo "New deployment" thì URL đổi và phải dán lại vào `config.js`.

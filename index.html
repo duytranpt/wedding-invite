@@ -60,23 +60,11 @@
   <div class="eyebrow">Thông tin buổi lễ</div>
   <h2>Chúng mình mời bạn</h2>
   <svg class="flourish" viewBox="0 0 180 34"><path d="M0 17 C 30 2, 60 32, 90 17 S 150 2, 180 17"/></svg>
-  <div class="events">
-    <div class="event-card">
-      <div class="kind">LỄ THÀNH HÔN</div>
-      <div class="time">10:00</div>
-      <div class="place">Chủ Nhật, 25/10/2026<br>Tư gia nhà trai — Thôn 7 Hiền Lương, Phú Thọ</div>
-    </div>
-    <div class="event-card">
-      <div class="kind">Tiệc Cưới</div>
-      <div class="time">10:30</div>
-      <div class="place">Chủ Nhật, 25/10/2026<br>Tư gia nhà trai — Thôn 7 Hiền Lương, Phú Thọ</div>
-    </div>
+  <div class="events" id="events"></div>
+  <div class="map-frame" id="event-map-frame">
+    <iframe id="event-map" title="Bản đồ địa điểm" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
   </div>
-  <div class="map-frame">
-    <iframe title="Thôn 7 Hiền Lương" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d927.7189097173604!2d104.94979029919739!3d21.55171749999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313361003172d3ed%3A0x37db4b10004a8566!2zTkjDgCBWxIJOIEhPw4EgS2h1IDEyIFh1w6JuIMOBbmc!5e0!3m2!1svi!2s!4v1791771049840!5m2!1svi!2s"></iframe>
-  </div>
-  <div class="addr-note">Thôn 7 Hiền Lương, Phú Thọ</div>
+  <div class="addr-note" id="event-address"></div>
 </section>
 
 <!-- ============================== RSVP ============================== -->

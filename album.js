@@ -7,11 +7,13 @@
   document.getElementById('album-title').textContent = album.title;
   document.getElementById('album-sub').textContent = album.subtitle || '';
 
+  document.querySelector('.album-head .back').href = withSide('index.html#album');
+
   // Nút chuyển nhanh giữa các concept
   const nav = document.getElementById('album-switch');
   ALBUMS.forEach(a => {
     const link = document.createElement('a');
-    link.href = `album.html?c=${encodeURIComponent(a.slug)}`;
+    link.href = withSide(`album.html?c=${encodeURIComponent(a.slug)}`);
     link.textContent = a.title;
     if(a.slug === album.slug) link.setAttribute('aria-current', 'page');
     nav.appendChild(link);

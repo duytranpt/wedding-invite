@@ -3,8 +3,8 @@
    (dùng chung cho index.html và album.html)
    ============================================================ */
 
-// Ngày giờ cưới. Định dạng: 'YYYY-MM-DDTHH:mm:ss'
-// WEDDING_DATE là mốc đếm ngược (ngày đầu). WEDDING_END_DATE là ngày cuối (để '' nếu chỉ cưới 1 ngày).
+// Khoảng ngày cưới hiển thị ở bìa. Định dạng: 'YYYY-MM-DDTHH:mm:ss'
+// WEDDING_END_DATE là ngày cuối (để '' nếu chỉ cưới 1 ngày). Đếm ngược lấy theo lễ đầu tiên của bên gửi thiệp (SIDES).
 const WEDDING_DATE = '2026-10-24T10:00:00';
 const WEDDING_END_DATE = '2026-10-25T18:00:00';
 
@@ -30,6 +30,35 @@ const ALBUMS = [
   { slug: 'concept-4', title: 'Đông', subtitle: DESC_DONG, folderId: '1llvwZ1AghGa3HAQIUd3HZjv26_yF_Qvo' },
 ];
 
+// Phiên bản thiệp theo bên gửi — mỗi bên có giờ lễ, địa điểm, bản đồ riêng.
+// Chọn bằng link: index.html (mặc định = DEFAULT_SIDE) hoặc index.html?side=nha-gai
+//   events[].date: 'YYYY-MM-DD', events[].time: 'HH:mm'
+//   showMap: false để ẩn bản đồ (vẫn hiện địa chỉ).
+//   mapEmbed: link "Nhúng bản đồ" của Google Maps; để '' thì tự tạo bản đồ theo `address`.
+const DEFAULT_SIDE = 'nha-trai';
+const SIDES = {
+  'nha-trai': {
+    label: 'Nhà trai',
+    address: 'Thôn 7 Hiền Lương, Phú Thọ',
+    showMap: true,
+    mapEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d927.7189097173604!2d104.94979029919739!3d21.55171749999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313361003172d3ed%3A0x37db4b10004a8566!2zTkjDgCBWxIJOIEhPw4EgS2h1IDEyIFh1w6JuIMOBbmc!5e0!3m2!1svi!2s!4v1791771049840!5m2!1svi!2s',
+    events: [
+      { kind: 'Lễ Thành Hôn', date: '2026-10-25', time: '10:00', place: 'Tư gia nhà trai — Thôn 7 Hiền Lương, Phú Thọ' },
+      { kind: 'Tiệc Cưới', date: '2026-10-25', time: '10:30', place: 'Tư gia nhà trai — Thôn 7 Hiền Lương, Phú Thọ' },
+    ],
+  },
+  'nha-gai': {
+    label: 'Nhà gái',
+    address: 'Thôn 21 Hiền Lương, Phú Thọ',
+    showMap: false,
+    mapEmbed: '',
+    events: [
+      { kind: 'Lễ Vu Quy', date: '2026-10-25', time: '09:00', place: 'Tư gia nhà gái — Thôn 21 Hiền Lương, Phú Thọ' },
+      { kind: 'Tiệc Cưới', date: '2026-10-25', time: '09:30', place: 'Tư gia nhà gái — Thôn 21 Hiền Lương, Phú Thọ' },
+    ],
+  },
+};
+
 // Folder chứa ảnh mã QR nhận mừng cưới. Tên file ảnh sẽ hiện làm chú thích dưới mỗi QR
 // (ví dụ "Duy Trần - Vietcombank.png" -> "Duy Trần - Vietcombank"). Có thể để nhiều QR.
 const QR_FOLDER_ID = '1HriU3eTAr46PeMcDFxpStqs6TNIGgLVO';
@@ -41,6 +70,21 @@ const RSVP_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxkt3E7mGSbJSOlB_
 /* ============================================================
    HÀM DÙNG CHUNG
    ============================================================ */
+
+// Bên gửi thiệp hiện tại, đọc từ ?side=... (sai/thiếu thì dùng DEFAULT_SIDE).
+const CURRENT_SIDE_KEY = (() => {
+  const key = new URLSearchParams(location.search).get('side');
+  return Object.prototype.hasOwnProperty.call(SIDES, key) ? key : DEFAULT_SIDE;
+})();
+const CURRENT_SIDE = SIDES[CURRENT_SIDE_KEY];
+
+// Giữ ?side=... khi chuyển giữa trang chủ và trang album, để khách nhà gái không bị quay về bản nhà trai.
+function withSide(url){
+  if(CURRENT_SIDE_KEY === DEFAULT_SIDE) return url;
+  const [path, hash] = url.split('#');
+  const sep = path.includes('?') ? '&' : '?';
+  return `${path}${sep}side=${encodeURIComponent(CURRENT_SIDE_KEY)}${hash ? '#' + hash : ''}`;
+}
 
 // Lấy danh sách ảnh trong 1 folder Drive. Trả về [] nếu thiếu cấu hình hoặc lỗi.
 async function fetchDriveImages(folderId, { pageSize = 1000, thumb = 1000 } = {}){
