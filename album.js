@@ -3,7 +3,8 @@
   const slug = new URLSearchParams(location.search).get('c');
   const album = ALBUMS.find(a => a.slug === slug) || ALBUMS[0];
 
-  document.title = `${album.title} — Album ảnh cưới Duy Trần & Thanh Huệ`;
+  renderCoupleNames();
+  document.title = `${album.title} — Album ảnh cưới ${COUPLE_NAMES}`;
   document.getElementById('album-title').textContent = album.title;
   document.getElementById('album-sub').textContent = album.subtitle || '';
 

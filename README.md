@@ -20,18 +20,23 @@ wedding-invite/
 
 Mở `config.js`:
 
-- `WEDDING_DATE` / `WEDDING_END_DATE` — ngày giờ cưới (đếm ngược lấy theo `WEDDING_DATE`; ngày hiển thị ở bìa tự format tiếng Việt, ví dụ "24 – 25 Tháng 10, 2026").
+- Ngày ở bìa, giờ lễ, địa điểm — nằm trong `SIDES`, riêng cho nhà trai / nhà gái (xem mục 2).
 - `ALBUMS` — 4 concept, mỗi concept gồm `slug`, `title`, `subtitle`, `folderId` (ID folder Drive chứa ảnh concept đó).
-- `QR_FOLDER_ID` — folder Drive chứa ảnh mã QR nhận mừng cưới (để nhiều QR cũng được; tên file hiện làm chú thích).
 - `RSVP_ENDPOINT` — Web app URL của Google Apps Script để RSVP ghi vào Google Sheet (xem mục 5).
 
 ## 2. Phiên bản nhà trai / nhà gái
 
 Cùng 1 trang, giờ lễ, địa điểm, bản đồ và đếm ngược đổi theo bên gửi thiệp. Sửa trong `SIDES` ở `config.js`:
 
+- `qrFolderId` — folder Drive chứa ảnh QR mừng cưới riêng của bên đó.
+- `heroDates` — ngày hiện ở bìa (`end: ''` nếu chỉ 1 ngày), ví dụ nhà trai "24 – 25 Tháng 10, 2026", nhà gái "25 Tháng 10, 2026".
 - `events` — danh sách lễ (`kind`, `date` dạng `YYYY-MM-DD`, `time` dạng `HH:mm`, `place`). Thứ ngày tự format tiếng Việt; đếm ngược chạy tới lễ sớm nhất.
 - `address` — địa chỉ hiện dưới phần thông tin lễ.
-- `showMap` — `false` để ẩn bản đồ (hiện đang ẩn với nhà gái).
+- `brideFirst` — `true` để tên cô dâu đứng trước chú rể (bìa, lời mời, footer, tiêu đề tab).
+- `showRsvp` — `false` để ẩn phần Xác nhận tham dự.
+- `showMap` — `false` để ẩn bản đồ.
+
+Hiện tại bản nhà gái: tên cô dâu đứng trước, ẩn RSVP, ẩn bản đồ. Tên cô dâu chú rể sửa ở `GROOM` / `BRIDE`.
 - `mapEmbed` — link nhúng Google Maps (Maps → Chia sẻ → Nhúng bản đồ → copy phần `src`). Để `''` thì tự tạo bản đồ theo `address`.
 
 Link gửi khách:
@@ -48,7 +53,7 @@ Tham số `side` được giữ khi khách bấm qua lại trang album, và đư
 Mở `index.html`, tìm các phần:
 
 - `.hero` — tên cô dâu chú rể, ảnh bìa (đổi `REPLACE_WITH_GDRIVE_LINK_COVER.jpg` trong CSS `.hero{ background: ... url(...) }`)
-- `.gift-box` — mã QR mừng cưới lấy tự động từ `QR_FOLDER_ID`
+- `.gift-box` — mã QR mừng cưới lấy tự động từ `qrFolderId` của từng bên trong `SIDES`
 
 ## 3. Ảnh từ Google Drive
 
@@ -61,7 +66,7 @@ Trang đã được cấu hình để **tự động lấy toàn bộ ảnh tron
    ```
    https://drive.google.com/drive/folders/FOLDER_ID
    ```
-3. Dán `FOLDER_ID` vào `folderId` của concept tương ứng trong `ALBUMS` (hoặc vào `QR_FOLDER_ID`) trong `config.js`. Mỗi concept và QR là một folder riêng, đều phải chia sẻ "Bất kỳ ai có đường liên kết".
+3. Dán `FOLDER_ID` vào `folderId` của concept tương ứng trong `ALBUMS` (hoặc vào `qrFolderId` của nhà trai / nhà gái trong `SIDES`) trong `config.js`. Mỗi concept và QR là một folder riêng, đều phải chia sẻ "Bất kỳ ai có đường liên kết".
 
 ### 3.2 Tạo API key (bắt buộc để gọi được Drive API)
 

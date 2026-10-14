@@ -27,13 +27,14 @@ function updateCountdown(){
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-// ---- Ngày hiển thị ở hero, lấy tự động từ WEDDING_DATE / WEDDING_END_DATE ----
+// ---- Ngày hiển thị ở hero, theo heroDates của bên gửi thiệp ----
 (function renderHeroDate(){
   const el = document.getElementById('hero-date');
   if(!el) return;
   const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
-  const start = new Date(WEDDING_DATE);
-  const end = WEDDING_END_DATE ? new Date(WEDDING_END_DATE) : null;
+  const { start: startDate, end: endDate } = CURRENT_SIDE.heroDates;
+  const start = new Date(`${startDate}T00:00:00`);
+  const end = endDate ? new Date(`${endDate}T00:00:00`) : null;
   const wd = d => cap(d.toLocaleDateString('vi-VN', { weekday: 'long' }));
 
   if(end && end.toDateString() !== start.toDateString()){
@@ -42,6 +43,10 @@ setInterval(updateCountdown, 1000);
     el.textContent = `${wd(start)}, ${start.getDate()} Tháng ${start.getMonth() + 1}, ${start.getFullYear()}`;
   }
 })();
+
+// ---- Tên cô dâu chú rể theo thứ tự của bên gửi thiệp ----
+renderCoupleNames();
+document.title = `${COUPLE_NAMES} — Thiệp Cưới`;
 
 // ---- Thông tin buổi lễ + bản đồ theo bên gửi thiệp (SIDES trong config.js) ----
 (function renderEvents(){
@@ -128,12 +133,12 @@ setInterval(updateCountdown, 1000);
   });
 })();
 
-// ---- Mã QR nhận mừng cưới: lấy toàn bộ ảnh trong QR_FOLDER_ID ----
+// ---- Mã QR nhận mừng cưới: lấy toàn bộ ảnh trong qrFolderId của bên gửi thiệp ----
 (async function renderQr(){
   const box = document.getElementById('qr-list');
   if(!box) return;
 
-  const items = await fetchDriveImages(QR_FOLDER_ID, { thumb: 800 });
+  const items = await fetchDriveImages(CURRENT_SIDE.qrFolderId, { thumb: 800 });
   if(!items.length) return; // giữ nguyên khung placeholder trong HTML
 
   box.innerHTML = '';
@@ -158,6 +163,11 @@ setInterval(updateCountdown, 1000);
 
 // ---- Xử lý RSVP ----
 (function handleRsvp(){
+  if(CURRENT_SIDE.showRsvp === false){
+    document.getElementById('rsvp')?.remove();
+    return;
+  }
+
   const form = document.getElementById('rsvp-form');
   const status = document.getElementById('rsvp-status');
   if(!form) return;

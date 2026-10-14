@@ -3,10 +3,9 @@
    (dùng chung cho index.html và album.html)
    ============================================================ */
 
-// Khoảng ngày cưới hiển thị ở bìa. Định dạng: 'YYYY-MM-DDTHH:mm:ss'
-// WEDDING_END_DATE là ngày cuối (để '' nếu chỉ cưới 1 ngày). Đếm ngược lấy theo lễ đầu tiên của bên gửi thiệp (SIDES).
-const WEDDING_DATE = '2026-10-24T10:00:00';
-const WEDDING_END_DATE = '2026-10-25T18:00:00';
+// Tên cô dâu chú rể. `initial` dùng cho monogram (D & H). Thứ tự hiển thị theo `brideFirst` của bên gửi thiệp.
+const GROOM = { name: 'Duy Trần', initial: 'D' };
+const BRIDE = { name: 'Thanh Huệ', initial: 'H' };
 
 // Google Drive: mỗi album/QR là 1 folder riêng.
 // Cách thiết lập — xem README mục "3. Ảnh từ Google Drive":
@@ -33,12 +32,20 @@ const ALBUMS = [
 // Phiên bản thiệp theo bên gửi — mỗi bên có giờ lễ, địa điểm, bản đồ riêng.
 // Chọn bằng link: index.html (mặc định = DEFAULT_SIDE) hoặc index.html?side=nha-gai
 //   events[].date: 'YYYY-MM-DD', events[].time: 'HH:mm'
+//   heroDates: ngày hiện ở bìa, { start: 'YYYY-MM-DD', end: 'YYYY-MM-DD' } — để end '' nếu chỉ 1 ngày.
+//   qrFolderId: folder Drive chứa ảnh mã QR mừng cưới của bên đó (tên file hiện làm chú thích, để nhiều QR được).
+//   brideFirst: true để tên cô dâu đứng trước chú rể.
+//   showRsvp: false để ẩn phần "Xác nhận tham dự".
 //   showMap: false để ẩn bản đồ (vẫn hiện địa chỉ).
 //   mapEmbed: link "Nhúng bản đồ" của Google Maps; để '' thì tự tạo bản đồ theo `address`.
 const DEFAULT_SIDE = 'nha-trai';
 const SIDES = {
   'nha-trai': {
     label: 'Nhà trai',
+    qrFolderId: '1HriU3eTAr46PeMcDFxpStqs6TNIGgLVO',
+    heroDates: { start: '2026-10-24', end: '2026-10-25' },
+    brideFirst: false,
+    showRsvp: true,
     address: 'Thôn 7 Hiền Lương, Phú Thọ',
     showMap: true,
     mapEmbed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d927.7189097173604!2d104.94979029919739!3d21.55171749999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313361003172d3ed%3A0x37db4b10004a8566!2zTkjDgCBWxIJOIEhPw4EgS2h1IDEyIFh1w6JuIMOBbmc!5e0!3m2!1svi!2s!4v1791771049840!5m2!1svi!2s',
@@ -49,6 +56,10 @@ const SIDES = {
   },
   'nha-gai': {
     label: 'Nhà gái',
+    qrFolderId: '1T6yAUw6PcITLyQl7gLjBmZJJW2_vNbo9',
+    heroDates: { start: '2026-10-25', end: '' },
+    brideFirst: true,
+    showRsvp: false,
     address: 'Thôn 21 Hiền Lương, Phú Thọ',
     showMap: false,
     mapEmbed: '',
@@ -58,10 +69,6 @@ const SIDES = {
     ],
   },
 };
-
-// Folder chứa ảnh mã QR nhận mừng cưới. Tên file ảnh sẽ hiện làm chú thích dưới mỗi QR
-// (ví dụ "Duy Trần - Vietcombank.png" -> "Duy Trần - Vietcombank"). Có thể để nhiều QR.
-const QR_FOLDER_ID = '1HriU3eTAr46PeMcDFxpStqs6TNIGgLVO';
 
 // Web app URL của Google Apps Script (apps-script/Code.gs) để ghi RSVP vào Google Sheet — xem README mục 5.
 // Dạng: 'https://script.google.com/macros/s/XXXX/exec'. Để trống thì form không lưu được.
@@ -77,6 +84,18 @@ const CURRENT_SIDE_KEY = (() => {
   return Object.prototype.hasOwnProperty.call(SIDES, key) ? key : DEFAULT_SIDE;
 })();
 const CURRENT_SIDE = SIDES[CURRENT_SIDE_KEY];
+
+const COUPLE = CURRENT_SIDE.brideFirst ? [BRIDE, GROOM] : [GROOM, BRIDE];
+const COUPLE_NAMES = `${COUPLE[0].name} & ${COUPLE[1].name}`;
+
+// Điền tên theo thứ tự của bên gửi vào các thẻ data-couple="name-1|name-2|initial-1|initial-2".
+function renderCoupleNames(){
+  document.querySelectorAll('[data-couple]').forEach(el => {
+    const [field, order] = el.dataset.couple.split('-');
+    const person = COUPLE[Number(order) - 1];
+    el.textContent = field === 'initial' ? person.initial : person.name;
+  });
+}
 
 // Giữ ?side=... khi chuyển giữa trang chủ và trang album, để khách nhà gái không bị quay về bản nhà trai.
 function withSide(url){
